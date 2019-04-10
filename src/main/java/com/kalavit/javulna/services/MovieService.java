@@ -18,6 +18,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.owasp.esapi.ESAPI;
+import org.owasp.esapi.codecs.MySQLCodec;
 import org.owasp.esapi.codecs.OracleCodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,12 @@ public class MovieService {
         int conditions = 0;
         StringBuilder sql = new StringBuilder("select description, title, genre, id from movie ");
 
+//        it is also possible to encode paramters using the ESAPI encoder, like this
+        LOG.info("Title encoded: " + ESAPI.encoder().encodeForSQL(new MySQLCodec(0), title));
+
+//       It also would be possible to do input validation using either regexp or Spring validation to prevent passing forbidden characters
+
+        // using parameters instead of creating entire query string with values in there
         List<String> parameters = new ArrayList<>();
 
         if (StringUtils.hasText(title)) {
