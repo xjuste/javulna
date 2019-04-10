@@ -9,16 +9,24 @@ import com.kalavit.javulna.dto.MovieDto;
 import com.kalavit.javulna.model.Movie;
 import com.kalavit.javulna.services.autodao.MovieAutoDao;
 import java.io.ByteArrayInputStream;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.owasp.esapi.ESAPI;
+import org.owasp.esapi.codecs.OracleCodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Document;
@@ -43,29 +51,41 @@ public class MovieService {
     public List<MovieDto> findMovie(String title, String description, String genre, String id) {
         int conditions = 0;
         StringBuilder sql = new StringBuilder("select description, title, genre, id from movie ");
+
+        List<String> parameters = new ArrayList<>();
+
         if (StringUtils.hasText(title)) {
             appendCondition(sql, conditions);
             conditions++;
-            sql.append("title LIKE '%").append(title).append("%'");
+//            sql.append("title LIKE '%").append(title).append("%'");
+            sql.append("title LIKE ?");
+            parameters.add(title);
 
         }
         if (StringUtils.hasText(description)) {
             appendCondition(sql, conditions);
             conditions++;
-            sql.append("description LIKE '%").append(description).append("%'");
+//            sql.append("description LIKE '%").append(description).append("%'");
+            sql.append("description LIKE ?");
+            parameters.add(description);
         }
         if (StringUtils.hasText(genre)) {
             appendCondition(sql, conditions);
             conditions++;
-            sql.append("genre LIKE '%").append(genre).append("%'");
+//            sql.append("genre LIKE '%").append(genre).append("%'");
+            sql.append("genre LIKE ?");
+            parameters.add(genre);
+
         }
         if (StringUtils.hasText(id)) {
             appendCondition(sql, conditions);
             conditions++;
-            sql.append("id = '").append(id).append("'");
+//            sql.append("id = '").append(id).append("'");
+            sql.append("id LIKE ?");
+            parameters.add(id);
         }
         LOG.debug(sql.toString());
-        List<MovieDto> users = this.jdbcTemplate.query(sql.toString(), new RowMapper<MovieDto>() {
+        List<MovieDto> users = this.jdbcTemplate.query(sql.toString(), parameters.toArray(), new RowMapper<MovieDto>() {
             @Override
             public MovieDto mapRow(ResultSet rs, int rowNum) throws SQLException {
                 MovieDto ret = new MovieDto();
