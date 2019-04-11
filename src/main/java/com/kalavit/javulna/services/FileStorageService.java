@@ -47,6 +47,10 @@ public class FileStorageService {
     }
     
     public Resource loadFileAsResource(String fileName) {
+        if ( (fileName.contains("/")) || fileName.contains("\\")) {
+            throw new RuntimeException("Not a valid fileName " + fileName);
+        }
+
         try {
             Path filePath = Paths.get(fileStorageDir, fileName);
             LOG.debug("gonna read file from {}" ,filePath.toString());
