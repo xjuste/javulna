@@ -12,6 +12,7 @@ import java.io.ByteArrayInputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.slf4j.Logger;
@@ -91,7 +92,12 @@ public class MovieService {
     public Movie saveMovieFromXml(String xml){
         try {
             Movie m = new Movie();
-            DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+//            dbf.setExpandEntityReferences(false);
+            dbf.setFeature("http://apache.org/xml/features/disallow-doctype-decl",true);
+            dbf.setFeature("http://xml.org/sax/features/external-general-entities",false);
+            dbf.setFeature("http://xml.org/sax/features/external-parameter-entities",false);
+            DocumentBuilder db = dbf.newDocumentBuilder();
             Document doc = db.parse(new ByteArrayInputStream(xml.getBytes("UTF-8")));
             Element root = doc.getDocumentElement();
             m.setTitle(getText(root, "title"));
