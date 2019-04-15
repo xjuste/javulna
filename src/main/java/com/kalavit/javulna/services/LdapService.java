@@ -17,6 +17,8 @@ import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
+
+import org.owasp.esapi.ESAPI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -52,7 +54,7 @@ public class LdapService {
         try {
             LdapUserDto ret = new LdapUserDto();
             DirContext ctx = initContext();
-            String filter = "(&(uid=" + uid + ") (userPassword=" + password + "))";
+            String filter = "(&(uid=" + ESAPI.encoder().encodeForLDAP(uid) + ") (userPassword=" + ESAPI.encoder().encodeForLDAP(password) + "))";
 
             SearchControls ctls = new SearchControls();
             ctls.setSearchScope(SearchControls.SUBTREE_SCOPE);
